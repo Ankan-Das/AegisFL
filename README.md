@@ -2,7 +2,7 @@
 
 **Privacy-Preserving Federated Learning at Scale — Secure, Compliant, and Cloud-Native.**
 
-AegisFL is a **production-ready federated learning platform** designed to train models across thousands of decentralized clients while ensuring strict data privacy. It combines **TensorFlow Federated** with **Differential Privacy**, **Secure Aggregation**, and **TLS-encrypted communication** to protect user data and meet regulatory standards.
+AegisFL is a **non-production-ready federated learning platform** designed to train models across thousands of decentralized clients while ensuring strict data privacy. It combines **TensorFlow Federated** with **Differential Privacy**, **Secure Aggregation**, and **TLS-encrypted communication** to protect user data and meet regulatory standards.
 
 ![banner](/assets/banner.png)
 
