@@ -25,7 +25,7 @@ AegisFL is a **non-production-ready federated learning platform** designed to tr
 MIT — See [LICENSE](LICENSE) for details.
 
 
-
+---
 
 # Federated Learning Platform – Prerequisite Knowledge Guide
 
