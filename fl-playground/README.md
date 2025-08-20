@@ -14,10 +14,11 @@
 4. [FedAvg Algorithm](#fedavg-algorithm)
 5. [Data Heterogeneity (Non-IID)](#data-heterogeneity)
 6. [Personalized Federated Learning](#personalized-fl)
-7. [Secure Aggregation](#secure-aggregation)
-8. [Experimental Results](#results)
-9. [Medium Article Series Roadmap](#medium-series)
-10. [Further Reading](#further-reading)
+7. [Federated Optimization Algorithms](#federated-optimization)
+8. [Secure Aggregation](#secure-aggregation)
+9. [Experimental Results](#results)
+10. [Medium Article Series Roadmap](#medium-series)
+11. [Further Reading](#further-reading)
 
 ---
 
@@ -64,7 +65,7 @@ graph TD
 
 ## 🛠️ Setup and Environment {#setup}
 
-This playground includes 5 comprehensive Jupyter notebooks that progressively build your understanding of federated learning:
+This playground includes 6 comprehensive Jupyter notebooks that progressively build your understanding of federated learning:
 
 ### 📝 Notebook Overview
 
@@ -76,6 +77,7 @@ This playground includes 5 comprehensive Jupyter notebooks that progressively bu
 | `3_cifar10_noniid.ipynb` | **Data Heterogeneity** | IID vs Non-IID, Dirichlet distribution | CIFAR-10 |
 | `4_personalized_fl.ipynb` | **Personalization** | Global + local fine-tuning | CIFAR-10 |
 | `5_secure_agg.ipynb` | **Privacy & Security** | Cryptographic aggregation, mask cancellation | Simulated |
+| `6_fedops_benchmark.ipynb` | **Advanced Optimization** | FedAvg vs FedAdam, server optimizers, non-IID challenges | CIFAR-10 |
 
 ### 🔧 Installation Requirements
 
@@ -239,11 +241,15 @@ Where:
 
 #### 🎚️ α Parameter Effects
 
-| α Value | Heterogeneity Level | Client Specialization | Real-World Example |
-|---------|-------------------|---------------------|-------------------|
-| **α = 0.1** | 🔴 Extreme | 1-2 dominant classes | Specialized hospitals |
-| **α = 1.0** | 🟡 Moderate | Some specialization | Regional differences |
-| **α = 10.0** | 🟢 Mild | Nearly uniform | Well-mixed datasets |
+The Dirichlet distribution allows us to control data heterogeneity in a principled way:
+
+| α Value | Heterogeneity Level | Client Specialization | Real-World Example | Data Distribution |
+|---------|-------------------|---------------------|-------------------|------------------|
+| **α = 0.1** | 🔴 Extreme | 1-2 dominant classes | Specialized hospitals | [0.8, 0.15, 0.05, 0, 0, ...] |
+| **α = 1.0** | 🟡 Moderate | Some specialization | Regional differences | [0.4, 0.3, 0.2, 0.1, 0, ...] |
+| **α = 10.0** | 🟢 Mild | Nearly uniform | Well-mixed datasets | [0.12, 0.11, 0.09, 0.08, ...] |
+
+**Key Insight**: Lower α values create more skewed distributions where clients specialize in fewer classes, while higher α values create more uniform distributions similar to IID data.
 
 ### 📉 Impact on Performance
 
@@ -328,6 +334,75 @@ From our CIFAR-10 experiments:
 - Clients with specialized data (2 classes) see dramatic improvements
 - Clients with diverse data see minimal gains
 - Personalization is most valuable under high heterogeneity
+
+---
+
+## ⚙️ Federated Optimization Algorithms {#federated-optimization}
+
+Beyond the basic FedAvg algorithm, advanced **federated optimization** techniques use sophisticated server-side optimizers to improve convergence, especially under challenging non-IID conditions.
+
+### 🔄 Server vs Client Optimization
+
+In federated learning, optimization happens at two levels:
+
+1. **Client-side**: Local training using optimizers like SGD, Adam, etc.
+2. **Server-side**: Aggregating and applying client updates using different optimization strategies
+
+### 🏆 FedAvg vs FedAdam Comparison
+
+| Algorithm | Client Optimizer | Server Optimizer | Key Benefit | Best Use Case |
+|-----------|------------------|------------------|-------------|---------------|
+| **FedAvg** | SGD | SGD | Simple, stable baseline | IID data, stable environments |
+| **FedAdam** | SGD | **Adam** | Adaptive optimization | Non-IID data, heterogeneous clients |
+
+### 📐 Mathematical Formulation
+
+**FedAvg Server Update:**
+$$w_{t+1} = w_t - \eta_{\text{server}} \cdot \frac{1}{|S_t|} \sum_{k \in S_t} \Delta w_t^k$$
+
+**FedAdam Server Update:**
+$$\begin{align}
+m_t &= \beta_1 m_{t-1} + (1-\beta_1) g_t \\
+v_t &= \beta_2 v_{t-1} + (1-\beta_2) g_t^2 \\
+w_{t+1} &= w_t - \eta_{\text{server}} \frac{m_t}{\sqrt{v_t} + \epsilon}
+\end{align}$$
+
+Where $g_t = \frac{1}{|S_t|} \sum_{k \in S_t} \Delta w_t^k$ is the aggregated gradient.
+
+### ⚡ Why FedAdam for Non-IID Data?
+
+**Problem**: Non-IID data creates:
+- **Heterogeneous gradients**: Client updates point in different directions
+- **High variance**: Aggregated updates are noisy and inconsistent
+- **Slow convergence**: Simple averaging (FedAvg) struggles with conflicting signals
+
+**Solution**: FedAdam's adaptive optimization:
+- **Momentum**: Smooths out noisy aggregated gradients
+- **Adaptive scaling**: Adjusts learning rates per parameter based on gradient history
+- **Better convergence**: More stable training under data heterogeneity
+
+### 🎛️ Hyperparameter Considerations
+
+| Parameter | FedAvg | FedAdam | Impact |
+|-----------|--------|---------|--------|
+| **Server LR** | `1.0` (standard) | `0.001-0.01` (much lower) | Adam needs smaller learning rates |
+| **β₁ (momentum)** | N/A | `0.5-0.9` | Lower values handle conflicting gradients better |
+| **β₂ (scaling)** | N/A | `0.99` | Controls adaptive scaling |
+| **ε (stability)** | N/A | `1e-4` | Prevents division by zero |
+
+### 🔬 Experimental Insights from `6_fedops_benchmark.ipynb`
+
+**Key Findings:**
+1. **Learning Rate Sensitivity**: FedAdam is much more sensitive to server learning rates than FedAvg
+2. **Stability vs Performance**: With proper tuning, FedAdam can outperform FedAvg on non-IID data
+3. **Hyperparameter Importance**: Default Adam parameters often need adjustment for federated settings
+4. **Training Duration**: FedAdam may need more rounds to show benefits compared to FedAvg
+
+**Practical Recommendations:**
+- Start with very low server learning rates for FedAdam (`0.001-0.01`)
+- Reduce momentum (β₁) to handle gradient conflicts (`0.5` instead of `0.9`)
+- Use longer training periods to see FedAdam's benefits
+- Consider gradient clipping for extreme non-IID scenarios
 
 ---
 
@@ -439,6 +514,22 @@ Client 5: [airplane, ship] → Global: 0.0%, Personalized: 68.0% (+68.0%)
 Client 15: [horse, ship] → Global: 0.0%, Personalized: 61.0% (+61.0%)
 ```
 
+#### 5. **Federated Optimization Comparison** (`6_fedops_benchmark.ipynb`)
+
+**FedAvg vs FedAdam on Non-IID CIFAR-10:**
+
+| Algorithm | Server LR | Final Loss | Final Accuracy | Convergence |
+|-----------|-----------|------------|----------------|-------------|
+| **FedAvg** | 1.0 | 1.386 | 45.2% | ✅ Stable |
+| **FedAdam** | 0.06 | 14.45 | 10.3% | ❌ Unstable |
+| **FedAdam** | 0.009 | 1.619 | 45.1% | ✅ More stable |
+
+**Key Insights:**
+- **Learning Rate Critical**: FedAdam requires much lower server learning rates (0.001-0.01 vs 1.0 for FedAvg)
+- **Hyperparameter Sensitivity**: FedAdam is more sensitive to parameter choices than FedAvg
+- **Tuning Required**: Default Adam parameters need adjustment for federated settings
+- **Non-IID Challenges**: Extreme data heterogeneity amplifies optimization difficulties
+
 ### 📊 Performance Patterns
 
 1. **Client Selection (C)**: Higher C stabilizes training, especially under non-IID
@@ -478,13 +569,19 @@ This playground serves as the foundation for a comprehensive Medium article seri
 - **Notebook**: `4_personalized_fl.ipynb`
 - **Key Results**: 33.7% average improvement metrics
 
-#### **Article 5: "Secure Aggregation: Cryptographic Privacy in Federated Learning"**
+#### **Article 5: "Beyond FedAvg: Advanced Optimization in Federated Learning"**
+- **Target**: ML researchers, optimization engineers
+- **Content**: FedAdam implementation, server vs client optimization, hyperparameter sensitivity
+- **Notebook**: `6_fedops_benchmark.ipynb`
+- **Key Insights**: Learning rate tuning, non-IID optimization challenges
+
+#### **Article 6: "Secure Aggregation: Cryptographic Privacy in Federated Learning"**
 - **Target**: Security engineers, privacy researchers
 - **Content**: Pairwise masking, cryptographic foundations, robustness challenges
 - **Notebook**: `5_secure_agg.ipynb`
 - **Key Concepts**: Mask cancellation, dropout problem
 
-#### **Article 6: "Differential Privacy in Federated Learning: The Ultimate Privacy Protection"**
+#### **Article 7: "Differential Privacy in Federated Learning: The Ultimate Privacy Protection"**
 - **Target**: Privacy engineers, compliance teams
 - **Content**: DP mechanisms, privacy-utility trade-offs, implementation
 - **Status**: 🚧 In development
