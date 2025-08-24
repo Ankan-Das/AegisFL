@@ -1,0 +1,14 @@
+{
+  "num_clients": 1000,
+  "samples_per_client": 50,
+  "rounds": 50,
+  "C": 50,
+  "E": 1,
+  "alpha_non_iid": 0.3,
+  "client_lr": 0.02,
+  "server_lr": 1.0,
+  "runtime_sec": {
+    "iid": 1090.7415809631348,
+    "non_iid": 1715.7301087379456
+  }
+}
