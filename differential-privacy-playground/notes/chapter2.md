@@ -1,3 +1,11 @@
+**You should be able to answer:**
+- What are neighboring datasets?
+- What do ε and δ mean (in one sentence)?
+- What is sensitivity and how does it set the noise?
+- What are Laplace/Gaussian mechanisms?
+- What is post‑processing? What is composition?
+
+
 # 🛠️ Chapter 2
 
 Chapter 2 is about the **tools** that make Differential Privacy (DP) actually work.  

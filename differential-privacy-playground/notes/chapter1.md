@@ -1,3 +1,11 @@
+**You should be able to answer:**
+- What are neighboring datasets?
+- What do ε and δ mean (in one sentence)?
+- What is sensitivity and how does it set the noise?
+- What are Laplace/Gaussian mechanisms?
+- What is post‑processing? What is composition?
+
+
 ## 1. What’s the big problem?
 
 Imagine a hospital releases a statistic: *“Average age of patients = 42.3.”*
