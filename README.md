@@ -21,6 +21,33 @@ AegisFL is a **non-production-ready federated learning platform** designed to tr
 - **Infrastructure:** Docker, Kubernetes, AWS EKS, SageMaker  
 - **Ops:** Prometheus, Grafana, Terraform, Helm
 
+## 🚀 Quick Start
+
+### Prerequisites
+- [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or Anaconda
+- Git
+
+### Setup Environment
+```bash
+# Clone and setup in one command
+git clone <your-repo-url>
+cd federated-learning-platform
+./setup_environment.sh
+
+# Activate environment
+conda activate tff
+
+# Validate setup
+python validate_environment.py
+```
+
+### Run Notebooks
+```bash
+jupyter notebook
+```
+
+**📖 Detailed setup guide:** See [SETUP.md](SETUP.md) for alternative installation methods and troubleshooting.
+
 ## 📜 License
 MIT — See [LICENSE](LICENSE) for details.
 

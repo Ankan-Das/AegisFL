@@ -1,0 +1,39 @@
+# Core TensorFlow ecosystem
+tensorflow==2.8.0
+tensorflow-estimator==2.8.0
+tensorflow-federated==0.31.0
+tensorflow-privacy==0.8.1
+tensorflow-probability==0.15.0
+tensorflow-model-optimization==0.7.2
+keras==2.8.0
+tensorboard==2.8.0
+
+# Scientific computing
+numpy==1.26.4
+scipy==1.13.1
+pandas==1.5.3
+scikit-learn==1.6.1
+matplotlib==3.9.4
+
+# JAX ecosystem
+jax==0.4.30
+jaxlib==0.4.30
+
+# Differential Privacy and Utilities
+dp-accounting==0.3.0
+dm-tree==0.1.7
+farmhashpy==0.4.0
+ml_dtypes==0.5.3
+
+# System utilities
+cloudpickle==3.1.1
+portpicker==1.6.0
+psutil==7.0.0
+tqdm==4.64.0
+retrying==1.4.2
+semantic-version==2.10.0
+
+# Python utilities
+importlib_metadata==8.7.0
+zipp==3.23.0
+zstandard==0.23.0
